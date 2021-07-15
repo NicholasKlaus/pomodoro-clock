@@ -1,11 +1,11 @@
 import { TYPES } from '../constants/types';
 
 const initialState = {
-  SessionLength: 25,
-  BreakLength: 5,
-  isSession: true,
-  timerMinute: 25,
-  timerSecond: 0,
+  sessionLength: 25,
+  breakLength: 5,
+  interval: 'Session',
+  secondsLeft: 25 * 60,
+  timerRunning: false,
 };
 
 export const timerReducer = (state = initialState, action) => {
@@ -13,39 +13,60 @@ export const timerReducer = (state = initialState, action) => {
     case TYPES.DECREMENT_BREAK:
       return {
         ...state,
-        BreakLength: state.BreakLength - 1
+        breakLength: state.breakLength - 1
       }
     case TYPES.INCREMENT_BREAK:
       return {
         ...state,
-        BreakLength: state.BreakLength + 1
+        breakLength: state.breakLength + 1
       }
     case TYPES.DECREMENT_SESSION:
       return {
         ...state,
-        SessionLength: state.SessionLength - 1,
-        timerMinute: state.timerMinute - 1
+        sessionLength: state.sessionLength - 1,
+        secondsLeft: (state.sessionLength - 1) * 60
       }
     case TYPES.INCREMENT_SESSION:
       return {
         ...state,
-        SessionLength: state.SessionLength + 1,
-        timerMinute: state.timerMinute + 1
+        sessionLength: state.sessionLength + 1,
+        secondsLeft: (state.sessionLength + 1) * 60
       }
-    case TYPES.UPDATE_TIMER_MINUTE:
+    case TYPES.START_TIMER:
       return {
         ...state,
-        timerMinute: state.timerMinute - 1
+        timerRunning: true
+      }
+    case TYPES.STOP_TIMER:
+      return {
+        ...state,
+        timerRunning: false
+      }
+    case TYPES.RESET_TIMER:
+      return {
+        ...state,
+        breakLength: 5,
+        sessionLength: 25,
+        interval: 'Session',
+        secondsLeft: 25 * 60,
+        timerRunning: false,
       }
     case TYPES.SWITCH_SESSION:
       return {
-        isSession: false,
-        timerMinute: state.BreakLength
+        ...state,
+        interval: 'Session',
+        secondsLeft: state.sessionLength * 60
       }
     case TYPES.SWITCH_BREAK:
       return {
-        isSession: true,
-        timerMinute: state.SessionLength
+        ...state,
+        interval: 'Break',
+        secondsLeft: state.breakLength * 60
+      }
+    case TYPES.DECREMENT_SECONDS:
+      return {
+        ...state,
+        secondsLeft: state.secondsLeft - 1
       }
     default:
       return state;

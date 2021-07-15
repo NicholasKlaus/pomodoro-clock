@@ -1,43 +1,60 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateTimer, endBreak, endSession } from '../redux/actions'
+import { resetTimer, startTimer, stopTimer, switchBreak, switchSession, decSeconds } from '../redux/actions'
+import soundfile from '../audioFile/soundfile.mp3';
 
 export const Timer = () => {
-  const { isSession, timerMinute, timerSecond, BreakLength, intervalId } = useSelector(({timer}) => timer)
+  const { timerRunning, secondsLeft, interval } = useSelector(({timer}) => timer)
   const dispatch = useDispatch();
+  const audio = new Audio(soundfile);
+  let minutes = Math.floor(secondsLeft / 60);
+  let seconds = secondsLeft - minutes * 60;
 
-  const playTimer = () => {
-    // intervalId = setInterval(decreaseTimer, 1000);
+  const Play = () => {
+    dispatch(startTimer());
+  }
+  const Stop = () => {
+    dispatch(stopTimer());
   }
 
-  const stopTimer = () => {
-
+  const Reset = () => {
+    dispatch(resetTimer());
   }
 
-  const refreshTimer = () => {
-
-  }
+  useEffect(() => {       
+    let countdown = null;
+    if (timerRunning && secondsLeft > 0) {
+      countdown = setInterval(() => {
+        dispatch(decSeconds());
+      }, 1000);
+    } else if (timerRunning && secondsLeft === 0) {
+      countdown = setInterval(() => {
+        dispatch(decSeconds());
+      }, 1000);
+      audio.play();
+      if (interval === 'Session') {
+        dispatch(switchBreak());
+      } else if (interval === 'Break') {
+        dispatch(switchSession());
+      }
+    } else {
+      clearInterval(countdown);
+    }
+    return () => clearInterval(countdown);
+  }, [timerRunning, secondsLeft, interval, dispatch]);
 
   return(
     <div>
       <div className="timer-container">
-        <h4> {isSession === true ? "Session" : "Break"} </h4>
-        <span className="timer"> {timerMinute} </span>
-        <span className="timer">:</span>
-        <span className="timer"> 
-          {
-            timerSecond === 0
-            ? "00" 
-            : timerSecond < 10
-            ? "0" + timerSecond 
-            : timerSecond
-          }
-        </span>
+        <h4> {interval} </h4>
+        <div className="timer">
+          {minutes < 10 ? ("0" + minutes).slice(-2) : minutes}:{seconds < 10 ? ("0" + seconds).slice(-2) : seconds}
+        </div>
       </div>
       <div className="timer-actions">
-        <button className="btn" onClick={playTimer}>Play</button>
-        <button className="btn" onClick={stopTimer}>Stop</button>
-        <button className="btn" onClick={refreshTimer}>Refresh</button>
+        <button className="btn" onClick={Play}>Play</button>
+        <button className="btn" onClick={Stop}>Stop</button>
+        <button className="btn" onClick={Reset}>Reset</button>
       </div>
     </div>
   );
