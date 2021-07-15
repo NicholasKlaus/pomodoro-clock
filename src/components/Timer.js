@@ -1,13 +1,27 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateTimer, endBreak, endSession } from '../redux/actions'
 
 export const Timer = () => {
-  const { isSession, timerMinute, timerSecond } = useSelector(({timer}) => timer)
+  const { isSession, timerMinute, timerSecond, BreakLength, intervalId } = useSelector(({timer}) => timer)
+  const dispatch = useDispatch();
+
+  const playTimer = () => {
+    // intervalId = setInterval(decreaseTimer, 1000);
+  }
+
+  const stopTimer = () => {
+
+  }
+
+  const refreshTimer = () => {
+
+  }
 
   return(
     <div>
       <div className="timer-container">
-        <h4> {isSession === true ? "Session" : "Breack"} </h4>
+        <h4> {isSession === true ? "Session" : "Break"} </h4>
         <span className="timer"> {timerMinute} </span>
         <span className="timer">:</span>
         <span className="timer"> 
@@ -21,9 +35,9 @@ export const Timer = () => {
         </span>
       </div>
       <div className="timer-actions">
-        <button className="btn">Play</button>
-        <button className="btn">Stop</button>
-        <button className="btn">Refresh</button>
+        <button className="btn" onClick={playTimer}>Play</button>
+        <button className="btn" onClick={stopTimer}>Stop</button>
+        <button className="btn" onClick={refreshTimer}>Refresh</button>
       </div>
     </div>
   );
